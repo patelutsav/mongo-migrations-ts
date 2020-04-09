@@ -1,0 +1,36 @@
+{
+  "name": "mongo-migrations-ts",
+  "version": "1.0.0",
+  "description": "A simple migration system for MongoDB supporting string version migrations and command line usage.",
+  "main": "lib/index.js",
+  "types": "lib",
+  "scripts": {
+    "build": "tsc -p .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "mongodb",
+    "mongo",
+    "migration"
+  ],
+  "author": "Utsav Patel",
+  "license": "MIT",
+  "homepage": "https://github.com/patelutsav/mongo-migrations-ts",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/patelutsav/mongo-migrations-ts.git"
+  },
+  "bugs": {
+    "url": "https://github.com/patelutsav/mongo-migrations-ts/issues"
+  },
+  "devDependencies": {
+    "typescript": "^3.8.3"
+  },
+  "dependencies": {
+    "@types/lodash": "^4.14.149",
+    "@types/md5": "^2.1.33",
+    "@types/mongodb": "^3.5.5",
+    "lodash": "^4.17.15",
+    "md5": "^2.2.1"
+  }
+}
