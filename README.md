@@ -1,6 +1,6 @@
 # mongo-migrations-ts
 
-A simple migration system for MongoDB supporting string version migrations and command line usage.
+A simple migration system for MongoDB supporting string version migrations.
 
 ## Installation
 
