@@ -38,10 +38,10 @@ const defaultControl: IStatusCollection = {
 }
 
 class Migrations {
-  static _list: IMigration[] = [];
-  static _statusCollection: Collection<IStatusCollection> | null = null;
-  static _listCollection: Collection<IListCollection> | null = null;
-  static options: IOptions = {
+  private static _list: IMigration[] = [];
+  private static _statusCollection: Collection<IStatusCollection> | null = null;
+  private static _listCollection: Collection<IListCollection> | null = null;
+  private static options: IOptions = {
     // false disables logging
     log: true,
     // null or a function
@@ -90,7 +90,7 @@ class Migrations {
     return await this._statusCollection.findOne({}) || defaultControl;
   }
 
-  static _findIndexByVersion(version: string) {
+  private static _findIndexByVersion(version: string) {
     if (version === '') {
       return -1;
     }
@@ -101,7 +101,7 @@ class Migrations {
     throw new Error("Can't find migration version " + version);
   }
 
-  static async _getExecutedVersions(): Promise<string[]> {
+  static async getExecutedVersions(): Promise<string[]> {
     if (!this._listCollection) {
       throw new Error('List collection not defined.');
     }
@@ -113,7 +113,7 @@ class Migrations {
       .map(a => a.replace(/\d+/g, n => (+Number.parseInt(n) - 100000).toString()));
   }
 
-  static _getAddedAllVersions() {
+  private static _getAddedAllVersions() {
     return this._list
       .map((item: IMigration) => item.version)
       .map(a => a.replace(/\d+/g, n => (+Number.parseInt(n) + 100000).toString()))
@@ -121,12 +121,12 @@ class Migrations {
       .map(a => a.replace(/\d+/g, n => (+Number.parseInt(n) - 100000).toString()));
   }
 
-  static async _findVersionsToExecute(): Promise<string[]> {
+  static async findVersionsToExecute(): Promise<string[]> {
     if (!this._listCollection) {
       throw new Error('List collection not defined.');
     }
     const versions = this._list.map((item: IMigration) => item.version);
-    const executedVersions = await this._getExecutedVersions();
+    const executedVersions = await this.getExecutedVersions();
     const versionsToExecute = versions.filter(item => executedVersions.indexOf(item) < 0);
     return versionsToExecute;
   }
@@ -134,7 +134,7 @@ class Migrations {
   private static async _checkIfOldVersionScriptAdded(versions: string[]) {
     let check = false;
     const list: string[] = [];
-    const executedVersions = await this._getExecutedVersions();
+    const executedVersions = await this.getExecutedVersions();
     const lastScriptIndex = this._findIndexByVersion(_.last(executedVersions) || '');
     versions.forEach((version) => {
       if (this._findIndexByVersion(version) < lastScriptIndex) {
@@ -187,6 +187,10 @@ class Migrations {
     }
     await this._statusCollection.remove({});
     await this._listCollection.remove({});
+  }
+
+  static async status() {
+    return (await this._getControl()).locked;
   }
 
   static async lock() {
@@ -255,7 +259,7 @@ class Migrations {
     let rerun = false;
 
     if (command === 'latest') {
-      versionsToExecute = await this._findVersionsToExecute();
+      versionsToExecute = await this.findVersionsToExecute();
       const oldVersionScripts = await this._checkIfOldVersionScriptAdded(versionsToExecute);
       if (oldVersionScripts.check && this.options.stopIfOldVersionScriptAdded) {
         console.info('Cannot migrate : Old version script found. Version: ' + oldVersionScripts.list.join(', '));
@@ -286,16 +290,16 @@ class Migrations {
     }
 
     if (rerun) {
-      await this.migrate(this._findIndexByVersion(versions[0]), rerun);
+      await this._migrate(this._findIndexByVersion(versions[0]), rerun);
     } else {
       for (const version of versions) {
-        await this.migrate(this._findIndexByVersion(version))
+        await this._migrate(this._findIndexByVersion(version))
       }
       await this._setControl({ version: _.last(versions) || '', locked: false });
     }
   }
 
-  static async migrate(index: number, rerun: boolean = false) {
+  private static async _migrate(index: number, rerun: boolean = false) {
     let migration = this._list[index];
 
     function scriptName() {
