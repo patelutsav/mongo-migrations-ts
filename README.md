@@ -47,9 +47,13 @@ To write a simple migration, somewhere in the server section of your project def
 To run this migration from within your app call, please be advice migrateTo function is an asynchronus call:
 
 ``` javascript
+    await Migrations.migrateTo('latest');
+```
 
-      await Migrations.migrateTo('latest');
+To check migration status:
 
+``` javascript
+    await Migrations.status(); // return boolean
 ```
 
 ### Advanced
@@ -76,7 +80,7 @@ A more complete set of migrations might look like:
 As in 'Basics', you can migrate to the latest by running:
 
 ``` javascript
-        Migrations.migrateTo('latest');
+    Migrations.migrateTo('latest');
 ```
 
 By specifying a version, you can run individual migrating script. The migrations system will simply execute the script.  
