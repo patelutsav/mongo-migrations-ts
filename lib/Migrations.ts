@@ -2,7 +2,7 @@ import md5 from 'md5';
 import * as _ from 'lodash';
 import { Collection } from 'mongodb';
 
-interface IMigration {
+export interface IMigration {
   version: string;
   name: string;
   run: (migration: IMigration) => void;
@@ -37,7 +37,7 @@ const defaultControl: IStatusCollection = {
   updateAt: new Date(),
 }
 
-class Migrations {
+export class Migrations {
   private static _list: IMigration[] = [];
   private static _statusCollection: Collection<IStatusCollection> | null = null;
   private static _listCollection: Collection<IListCollection> | null = null;
@@ -343,5 +343,3 @@ function isFormatedVersion(version: string) { // expected format: 0.0.0_0
   const pattern = /^\d+[\.]\d+[\.]\d+[_]\d+$/;
   return pattern.test(version);
 };
-
-module.exports = Migrations;
